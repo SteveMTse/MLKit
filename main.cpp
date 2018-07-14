@@ -12,7 +12,7 @@ triplet<int> tri_test() {
 }
 
 template<typename T, typename L>
-class linear: public generic_model {
+class linear: public generic_model<T, L> {
     public:
         linear() {}
 
@@ -161,7 +161,7 @@ int main(int argc, char* argv[]) {
     Cast<int> cfi = Cast<int>({'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'}, "stoi");
     auto train_x = data_generator<double>("semeion.data.txt", ' ', cfd, 0, 256);
     auto train_y = data_generator<int>("semeion.data.txt", ' ', cfi, 256, 10);
-    linear lm = linear();
+    linear<double, int> lm = linear<double, int>();
     lm.fit(train_x, train_y);
     lm.show();
     // auto dim_x = train_x.dim();
