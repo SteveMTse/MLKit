@@ -1,13 +1,14 @@
 #ifndef MLKIT_HPP
 #define MLKIT_HPP
 
-#include "Standerd.hpp"
-#include "Linkedlist.hpp"
-#include "Math.hpp"
-#include "Tools.hpp"
-#include "Type.hpp"
-#include "Matrix.hpp"
-#include "Cast.hpp"
+// #include "Standerd.hpp"
+// #include "Linkedlist.hpp"
+// #include "Math.hpp"
+// #include "Tools.hpp"
+// #include "Type.hpp"
+// #include "Matrix.hpp"
+// #include "Cast.hpp"
+#include "MODELS/LinearRegression.hpp"
 
 template<typename T, typename L>
 class generic_model {

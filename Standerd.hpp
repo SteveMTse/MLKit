@@ -13,6 +13,7 @@
 #include <functional>
 #include <exception>
 #include <stdexcept>
+#include <OpenCL/opencl.h>
 
 using namespace std;
 
