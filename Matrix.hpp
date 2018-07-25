@@ -1,4 +1,3 @@
-
 #ifndef MATRIX_HPP
 #define MATRIX_HPP
 
@@ -10,6 +9,10 @@ class Matrix {
 
     private:
          T** matrix = NULL;
+         T** matrix_inv = NULL;
+         T zero = 0;
+         T one = 1;
+
          int size = 0;
          int row = 0;
          int col = 0;
@@ -99,6 +102,93 @@ class Matrix {
             delete[] index_info;
          }
 
+         inline void LinearEquationSolver(T* &b, T* &x, T** &L, T** &U, T* &y, int &n) {
+            
+            T sum = zero;
+
+            //Foreward substitution
+            
+            // x = new T[n];
+            for(int i = 0 ; i < n ; i++) { 
+                y[i] = zero;
+                x[i] = zero;
+            }
+
+            for(int k = 0 ; k < n ; k++) {
+                for(int j = 0 ; j <= k - 1 ; j++) {
+                    sum = sum + (L[k][j] * y[j]);
+                }
+                y[k] = (b[k] - sum) / L[k][k];
+                sum = zero;
+            }
+
+            //Backward substitution
+            sum = zero;
+            for(int k = n - 1 ; k >= 0 ; k--) {
+                for(int j = k + 1 ; j < n ; j++) {
+                    sum = sum + (U[k][j] * x[j]);
+                }
+                x[k] = (y[k] - sum) / U[k][k];
+                sum = zero;
+            }
+
+         }
+
+         void MatrixInverse() {
+            
+            int n = -1;
+            if(this -> col != this -> row) {
+                return;
+            }
+            else {
+                n = this -> col;
+            }
+
+            T* b = new T[n];
+            T* x = new T[n];
+            T* y = new T[n];
+
+            T** L = new T*[n];
+            T** U = new T*[n];
+
+            //LU Decomposition
+            //Initialize L and U;
+            for(int i = 0 ; i < n ; i++) {
+                L[i] = new T[n];
+                U[i] = new T[n];
+                for(int j = 0 ; j < n ; j++) {
+                    L[i][j] = (j == i) ? 1 : 0;
+                    U[i][j] = (this -> matrix)[i][j];
+                }
+            }
+
+            //LU Factorization
+            for(int k = 0 ; k < n - 1 ; k++) {
+                for(int j = k+1 ; j < n ; j++) {
+                    L[j][k] = U[j][k] / U[k][k];
+                    for(int i = k ; i < n ; i++) {
+                        U[j][i] = U[j][i] - (L[j][k]*U[k][i]);
+                    }
+                }
+            }
+
+            for(int i = 0 ; i < n ; i++) {
+                for(int j = 0 ; j < n ; j++) {
+                    b[j] = (i != j) ? 0 : 1;
+                }
+                this -> LinearEquationSolver(b, x, L, U, y, n);
+                for(int j = 0 ; j < n ; j++) {
+                    (this -> matrix_inv)[j][i] = x[j];
+                }
+            }
+
+            delete[] L;
+            delete[] U;
+            delete[] b;
+            delete[] x;
+            delete[] y;
+         }
+
     public:
 
           Matrix() {}
@@ -107,59 +197,93 @@ class Matrix {
               this -> row = arg.size();
               this -> col = (arg.size() != 0) ? (*arg.begin()).size() : 0;
               this -> matrix = new T*[this -> row];
+              this -> matrix_inv = new T*[this -> row];
               this -> size = (this -> row) * (this -> col);
               int i = 0, j = 0;
               for(auto && ROW : arg) {
                   (this -> matrix)[i] = new T[this -> col];
+                  (this -> matrix_inv)[i] = new T[this -> col];
                   for(auto && COL : ROW) {
                       (this -> matrix)[i][j] = COL;
+                      (this -> matrix_inv)[i][j] = zero;
                       j++;
                   }
                   j = 0; i++;
               }
+              this -> MatrixInverse();
           }
 
           Matrix(T arg[r][c]) {
             this -> row = r;
             this -> col = c;
             this -> matrix = new T*[this -> row];
+            this -> matrix_inv = new T*[this -> row];
             this -> size = (this -> row) * (this -> col);
             for(int i = 0 ; i < row ; i++) {
                 matrix[i] = new T[col];
+                (this -> matrix_inv)[i] = new T[this -> col];
                 for(int j = 0 ; j < col ; j++) {
                     (this -> matrix)[i][j] = arg[i][j];
+                    (this -> matrix_inv)[i][j] = zero;
                 }
             }
+            this -> MatrixInverse();
           }
 
           Matrix(T** arg) {
             this -> row = r;
             this -> col = c;
             this -> matrix = new T*[this -> row];
+            this -> matrix_inv = new T*[this -> row];
             this -> size = (this -> row) * (this -> col);
             for(int i = 0 ; i < row ; i++) {
                 matrix[i] = new T[col];
+                (this -> matrix_inv)[i] = new T[this -> col];
                 for(int j = 0 ; j < col ; j++) {
                     (this -> matrix)[i][j] = arg[i][j];
+                    (this -> matrix_inv)[i][j] = zero;
                 }
             }
+            this -> MatrixInverse();
           }
 
           Matrix(T** arg, int arg_row, int arg_col) {
             this -> row = arg_row;
             this -> col = arg_col;
             this -> matrix = new T*[this -> row];
+            this -> matrix_inv = new T*[this -> row];
             this -> size = (this -> row) * (this -> col);
             for(int i = 0 ; i < row ; i++) {
                 matrix[i] = new T[col];
+                (this -> matrix_inv)[i] = new T[this -> col];
                 for(int j = 0 ; j < col ; j++) {
                     (this -> matrix)[i][j] = arg[i][j];
+                    (this -> matrix_inv)[i][j] = zero;
                 }
             }
+            this -> MatrixInverse();
+          }
+
+          Matrix(int arg_row, int arg_col, T init_val) {
+            this -> row = arg_row;
+            this -> col = arg_col;
+            this -> matrix = new T*[this -> row];
+            this -> matrix_inv = new T*[this -> row];
+            this -> size = (this -> row) * (this -> col);
+            for(int i = 0 ; i < row ; i++) {
+                matrix[i] = new T[col];
+                (this -> matrix_inv)[i] = new T[this -> col];
+                for(int j = 0 ; j < col ; j++) {
+                    (this -> matrix)[i][j] = init_val;
+                    (this -> matrix_inv)[i][j] = zero;
+                }
+            }
+            this -> MatrixInverse();
           }
 
           ~Matrix() {
               delete[] this -> matrix;
+              delete[] this -> matrix_inv;
               // cout<<"Deleted!"<<endl;
           }
 
@@ -178,18 +302,22 @@ class Matrix {
           void set_dim(int arg_row, int arg_col) {
               if(this -> matrix != NULL) {
                   delete[] (this -> matrix);
+                  delete[] (this -> matrix_inv);
                   this -> matrix = NULL;
               }
               this -> row = arg_row;
               this -> col = arg_col;
               this -> size = arg_row * arg_col;
               this -> matrix = new T*[this -> row];
+              this -> matrix = new T*[this -> row];
               for(int i = 0 ; i < this -> row ; i++) {
                   (this -> matrix)[i] = new T[this -> col];
-                //   for(int j = 0 ; j < this -> col ; j++) {
-                //       (this -> matrix)[i][j] = 0;
-                //   }
+                  (this -> matrix_inv)[i] = new T[this -> col];
               }
+          }
+
+          void update() {
+              this -> MatrixInverse();
           }
 
           T** get_matrix() {
@@ -234,7 +362,8 @@ class Matrix {
           }
 
           Matrix<T> inverse() {
-              //TODO;
+                Matrix<T> inv = Matrix<T>(this -> matrix_inv, this -> row, this -> col);
+                return inv;
           }
 
           void show() {

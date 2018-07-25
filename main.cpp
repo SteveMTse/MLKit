@@ -18,6 +18,7 @@ class linear: public generic_model<T, L> {
 
         
         void fit(Matrix<T>& X, Matrix<L>& Y) {
+            // generic_model::fit(X, Y);
             this -> a = 5;
         }
 
@@ -157,12 +158,15 @@ int main(int argc, char* argv[]) {
     // String s = "123.45";
     // cout<<cast(s)<<endl;
     // auto matrix = data_generator<double>("semeion.data.txt", ' ', cast);
-    Cast<double> cfd = Cast<double>({'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'}, "stod");
-    Cast<int> cfi = Cast<int>({'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'}, "stoi");
-    auto train_x = data_generator<double>("semeion.data.txt", ' ', cfd, 0, 256);
-    auto train_y = data_generator<int>("semeion.data.txt", ' ', cfi, 256, 10);
-    LinearRegression<double, int> lm = LinearRegression<double, int>();
-    lm.fit(train_x, train_y);
+    // Cast<double> cfd = Cast<double>({'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'}, "stod");
+    // Cast<int> cfi = Cast<int>({'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'}, "stoi");
+    // auto train_x = data_generator<double>("semeion.data.txt", ' ', cfd, 0, 256);
+    // auto train_y = data_generator<int>("semeion.data.txt", ' ', cfi, 256, 10);
+    // LinearRegression<double, int> lm = LinearRegression<double, int>();
+    // lm.fit(train_x, train_y);
+    Matrix<double> A = {{1, 1, 0, 1}, {2, 1, -1, 1}, {4, -1, -2, 2}, {3, -1, -1, 1}};
+    A.inverse();
+    // A.show();
     // lm.show();
     // auto dim_x = train_x.dim();
     // auto dim_y = train_y.dim();
